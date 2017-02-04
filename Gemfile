@@ -5,3 +5,5 @@ gemspec
 gem 'rack'
 gem 'sqlite3'
 gem 'sequel'
+
+gem 'puma'

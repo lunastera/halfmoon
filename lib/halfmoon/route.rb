@@ -6,6 +6,26 @@ module HalfMoon
   class Route
     attr_reader :var_rexp
 
+    class << self
+      attr_reader :path
+      def generate(&block)
+        @path = []
+        @buff = []
+        yield(self)
+        $mapping = @path
+      end
+
+      def get(path, action)
+        @buff << [path, action]
+      end
+
+      def root(path, &block)
+        yield
+        @path << [path, @buff]
+        @buff = []
+      end
+    end
+
     def initialize(mapping)
       @dict_path = {}
       @var_path = []
@@ -36,10 +56,10 @@ module HalfMoon
 
       # 存在しなければ404
       return { File: 404, Action: nil, PathV: nil } if actions.nil?
-      file, action = actions.split(/\//)
+      file, action = actions.split('/')
       # メソッド未定義ならindexメソッド
       action = 'index' if action.nil?
-      # FilePath, ClassName, MethodName, PathValiable
+      # FileName, ClassName, MethodName, PathValiable
       { File: file, Action: action, PathV: dict }
     end
 
@@ -91,7 +111,7 @@ module HalfMoon
     def require_action(action)
       file, action = action.split(/\//)
       begin
-        require Config[:root] + Config[:ctrl_path] + file
+        require Config[:root] + Config[:ctrl_path] + file + '_controller'
       rescue LoadError => ex
         p Config[:root] + Config[:ctrl_path] + file
         raise ex, 'specified file does not exist.'

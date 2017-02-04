@@ -13,7 +13,6 @@ require 'halfmoon/loader'
 require 'halfmoon/db'
 require 'halfmoon/migration'
 require 'halfmoon/cli'
-require 'halfmoon/server'
 
 module HalfMoon
   extend HalfMoon::Loader
@@ -27,7 +26,7 @@ module HalfMoon
     end
 
     def response_action(req)
-      HalfMoon.hm_load Config[:ctrl_path] + @args[:File]
+      HalfMoon.hm_load Config[:ctrl_path] + @args[:File] + '_controller'
 
       klass = @args[:File].capitalize + 'Controller'
       ins = Kernel.const_get(klass).new(compile_params(req))

@@ -1,0 +1,8 @@
+class <%= name.capitalize %>Migration < HalfMoon::Migration
+  def change
+    @db.create_table <%= name + 's'%> do
+      <% @c.each do |k, v| %><%= v + ' ' + k %>
+      <% end %>
+    end
+  end
+end

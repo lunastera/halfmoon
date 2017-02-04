@@ -22,5 +22,17 @@ module HalfMoon
         config:       'config.ru'
       }
     end
+
+    private
+      def build_app_and_options_from_config
+        if !::File.exist? options[:config]
+          puts options
+          abort "configuration #{options[:config]} not found"
+        end
+
+        app, options = Rack::Builder.parse_file(self.options[:config], opt_parser)
+        self.options.merge! options
+        app
+      end
   end
 end

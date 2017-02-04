@@ -1,0 +1,2 @@
+class <%= name.capitalize%> < Sequel::Model
+end

@@ -21,11 +21,6 @@ class DebugController < Action
     render(:html, 'debug/debug')
   end
 
-  def edit
-    @action = { Class: fullname, Method: __method__ }
-    render(:html, 'debug/debug')
-  end
-
   def fullname
     self.class.to_s
   end

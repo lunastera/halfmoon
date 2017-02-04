@@ -12,7 +12,7 @@
   <% @users.each do |user| %>
   <%="id: #{user[:id]}, name: #{user[:name]}, pass: #{user[:pass]}<br />"%>
   <% end %>
-  <h2><%= 'Sessionを使います: ' + (session[:hoge].nil? ? 'Sessionはありません' : session[:hoge]) %></h2>
+  <h2><%= (session[:hoge].nil? ? 'Sessionはありません' : session[:hoge]) %></h2>
   <h2><%= @action[:Class] %>#<%= @action[:Method] %></h2>
   <div class="inline">
     <section>

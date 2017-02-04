@@ -1,0 +1,4 @@
+class <%= name.capitalize %>Controller < Action<% methods.each do |method|%>
+  def <%= method %>
+  end
+<% end %>end

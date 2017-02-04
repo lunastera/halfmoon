@@ -1,9 +1,6 @@
 require 'digest/sha2'
 # Main config
 class Config < ConfigBase
-  # app setting
-  # add :port,         '8282'
-
   # database settings
   add :db_host,      'localhost'
   add :db_port,      '8888'
@@ -26,7 +23,7 @@ class Config < ConfigBase
   add :session_domain, nil
   add :session_path, '/'
   add :session_expire_after, 60 * 60 # Cookieの有効期限 1時間
-  add :session_secret, Digest::SHA256.hexdigest(rand.to_s) # セキュリティの関係上必ず設定すること!!
+  add :session_secret, Digest::SHA256.hexdigest(rand.to_s) # セキュリティの関係上必ず設定すること!
 end
 
 # 注: 1
