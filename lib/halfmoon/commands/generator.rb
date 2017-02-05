@@ -63,11 +63,18 @@ module HalfMoon
     def setting
       require 'halfmoon/config'
       require "#{File.expand_path('.')}/app/config/config.rb"
-      @dir = Config[:root] + Config[:ctrl_path]
+      @ctrl = Config[:root] + Config[:ctrl_path]
+      @view = Config[:root] + Config[:view_path]
     end
 
     def create_controller
-      template "./templates/controller.tt", "#{@dir}/#{name}_controller.rb"
+      template "./templates/controller.tt", "#{@ctrl}/#{name}_controller.rb"
+    end
+
+    def create_view
+      methods.each do |m|
+        template './templates/view.tt', "#{@view}/#{m}.erb"
+      end
     end
 
     def complete_message

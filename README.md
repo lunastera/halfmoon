@@ -1,41 +1,44 @@
-# Halfmoon
+## 使い方
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/halfmoon`. To experiment with that code, run `bin/console` for an interactive prompt.
+### インストール
 
-TODO: Delete this and the text above, and describe your gem
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'halfmoon'
+```
+git clone https://github.com/sobreera/halfmoon.git
+cd halfmoon
+bundle install
 ```
 
-And then execute:
+### 各ジェネレータ
 
-    $ bundle
+#### プロジェクトの作成
 
-Or install it yourself as:
+```
+bundle exec bin/halfmoon new exampleProject
+cd exampleProject
+```
 
-    $ gem install halfmoon
+#### コントローラーの作成
 
-## Usage
+    bundle exec ../bin/halfmoon generator controller users index show
 
-TODO: Write usage instructions here
+#### モデルの作成
 
-## Development
+    bundle exec ../bin/halfmoon generator model users
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+### ルーティングの設定
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+app/config/route.rb
+```ruby
+HalfMoon::Route::generate do |r|
+  r.root '/user' do
+    r.get '/index', 'users/index'
+    r.get '/:id',   'users/show'
+  end
+end
+```
 
-## Contributing
+### 起動
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/halfmoon. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+config.ruが存在しているディレクトリで
 
-
-## License
-
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
+    bundle exec ../bin/halfmoon server
