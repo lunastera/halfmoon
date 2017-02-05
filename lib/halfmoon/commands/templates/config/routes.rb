@@ -18,5 +18,20 @@
 #
 # ['RequestPath', 'ControllerFileName/MethodName']
 #
+# OR
+#
+# HalfMoon::Route.generate do |r|
+#   r.root '/debug' do
+#     r.get '',           'debug/index'
+#     r.get '/:id',       'debug/show'
+#     r.get '/:name/:id', 'debug/show'
+#   end
+#   r.root '/users' do
+#     r.get '',           'users/index'
+#     r.get '/show',      'users/show'
+#     r.get '/show/:id',  'users/show'
+#   end
+# end
+#
 # /:<name> is URL Path Parameter
 # You can retrieve the value by calling @paths [: <name>] in Controller or View.

@@ -31,6 +31,7 @@ module HalfMoon
       @var_path = []
       buf = compile_path_regexp(mapping, '', '')
       @var_rexp = Regexp.compile(buf.gsub(%r{\|\([^./]+}, '(?:'))
+      @var_rexp = /[^\w\W]/ unless @var_rexp.to_s =~ %r{\(\\z\)}
     end
 
     # debug
@@ -43,7 +44,8 @@ module HalfMoon
       # request_pathの最後に'/'があれば削除
       request_path.chop! if request_path.gsub!(%r{/+}, '/')[-1] == '/'
       # 正規表現で何番目のvar_url_listにマッチするか調べる
-      find_route = @var_rexp.match(request_path) #/users/show
+      find_route = @var_rexp.match(request_path) # /users/show
+      p find_route
       # var_url_listのものでない(nil)ならば、O(1)でHashから検索
       if find_route.nil?
         actions = @dict_path[request_path]
@@ -96,8 +98,7 @@ module HalfMoon
         # puts "'#{path}' => #{current_fullpath} #{action}"
         @dict_path[current_fullpath + path] = action
       end
-      # からパスだけ・・・？
-      path.gsub(%r{:[^./]+}, '\w+') + '(\z)' if path.scan(/:\w+/) != []
+      (path.scan(/:\w+/) == []) ? nil : path.gsub(%r{:[^./]+}, '\w+') + '(\z)'
     end
 
     # var_url_listの場合、場所を特定する正規表現も必要なので作成

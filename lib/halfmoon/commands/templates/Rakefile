@@ -11,21 +11,19 @@ namespace :db do
     require 'halfmoon/migration'
   end
 
-  desc 'Migrationファイルを作成'
-  task :create, ['name'] => [:require_config] do |_, args|
-    file Config[:db_name] do
-    end
-  end
-
   desc 'MigrationファイルからDBを操作'
   task :migration, ['method', 'table'] => [:require_config, :require_model] do |_, args|
     Config.add :root, File.expand_path(File.dirname(__FILE__))
     require_relative "./app/db/migration/#{args[:table]}_migration.rb"
     klass = "#{args[:table].capitalize}Migration"
-    if args[:method] == 'create'
-      Kernel.const_get(klass).new.create
-    elsif args[:method] == 'change'
-      Kernel.const_get(klass).new.change
+    begin
+      Kernel.const_get(klass).new.send(args[:method].to_sym)
+    rescue NoMethodError
+      puts "undefined method `#{args[:method]}` for #{klass}."
+      exit(1)
+    rescue NameError
+      puts 'クラスが存在しません。クラス名はテーブル名の単数形です。'
+      exit(1)
     end
   end
 end
