@@ -12,7 +12,7 @@ namespace :db do
   end
 
   desc 'MigrationファイルからDBを操作'
-  task :migration, ['method', 'table'] => [:require_config, :require_model] do |_, args|
+  task :migration, ['table', 'method'] => [:require_config, :require_model] do |_, args|
     Config.add :root, File.expand_path(File.dirname(__FILE__))
     require_relative "./app/db/migration/#{args[:table]}_migration.rb"
     klass = "#{args[:table].capitalize}Migration"
@@ -20,9 +20,6 @@ namespace :db do
       Kernel.const_get(klass).new.send(args[:method].to_sym)
     rescue NoMethodError
       puts "undefined method `#{args[:method]}` for #{klass}."
-      exit(1)
-    rescue NameError
-      puts 'クラスが存在しません。クラス名はテーブル名の単数形です。'
       exit(1)
     end
   end

@@ -36,7 +36,7 @@ module HalfMoon
     end
 
     def create_exceptions
-      copy_file "#{@file}/templates/exceptions/default.erb", "#{name}/app/exeptions/default.erb"
+      copy_file "#{@file}/templates/exceptions/default.erb", "#{name}/app/exceptions/default.erb"
     end
 
     def create_other_files
@@ -73,7 +73,7 @@ module HalfMoon
 
     def create_view
       methods.each do |m|
-        template './templates/view.tt', "#{@view}/#{m}.erb"
+        template './templates/view.tt', "#{@view}/#{name}/#{m}.erb"
       end
     end
 
@@ -95,6 +95,7 @@ module HalfMoon
     def setting
       require 'halfmoon/config'
       require "#{File.expand_path('.')}/app/config/config.rb"
+      require 'active_support'
       @model = Config[:root] + Config[:model_path]
       @migrate = Config[:root] + Config[:db_path]
     end
@@ -120,7 +121,7 @@ module HalfMoon
     end
 
     def create_migration
-      template "./templates/models/migration.tt", "#{@migrate}/migration/#{name}s_migration.rb"
+      template "./templates/models/migration.tt", "#{@migrate}/migration/#{name.pluralize}_migration.rb"
     end
 
     def complete_message

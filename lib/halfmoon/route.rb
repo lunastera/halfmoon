@@ -44,16 +44,27 @@ module HalfMoon
       # request_pathの最後に'/'があれば削除
       request_path.chop! if request_path.gsub!(%r{/+}, '/')[-1] == '/'
       # 正規表現で何番目のvar_url_listにマッチするか調べる
-      find_route = @var_rexp.match(request_path) # /users/show
-      p find_route
-      # var_url_listのものでない(nil)ならば、O(1)でHashから検索
-      if find_route.nil?
+      # find_route = @var_rexp.match(request_path) # /users/show
+      # # var_url_listのものでない(nil)ならば、O(1)でHashから検索
+      # if find_route.nil?
+      #   actions = @dict_path[request_path]
+      #   dict = nil
+      # else
+      #   rexp, names, actions = @var_path[find_route.captures.find_index('')]
+      #   values = rexp.match(request_path).captures
+      #   dict = Hash[names.zip(values)]
+      # end
+
+      if @dict_path.key?(request_path)
         actions = @dict_path[request_path]
         dict = nil
       else
-        rexp, names, actions = @var_path[find_route.captures.find_index('')]
-        values = rexp.match(request_path).captures
-        dict = Hash[names.zip(values)]
+        find_route = @var_rexp.match(request_path)
+        unless find_route.nil?
+          rexp, names, actions = @var_path[find_route.captures.find_index('')]
+          values = rexp.match(request_path).captures
+          dict = Hash[names.zip(values)]
+        end
       end
 
       # 存在しなければ404
@@ -91,7 +102,7 @@ module HalfMoon
         require_action(action)
         @var_path << [
           Regexp.compile("\\A#{current_fullpath + reg_path}\\z"),
-          var.map { |str| str.delete(':') },
+          var.map { |str| str.delete(':').to_sym },
           action
         ]
       else
@@ -110,7 +121,7 @@ module HalfMoon
 
     # 指定されたパスが存在しているか
     def require_action(action)
-      file, action = action.split(/\//)
+      file, action = action.split('/')
       begin
         require Config[:root] + Config[:ctrl_path] + file + '_controller'
       rescue LoadError => ex
