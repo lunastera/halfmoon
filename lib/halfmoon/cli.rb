@@ -11,7 +11,7 @@ module HalfMoon
       Server.start
     end
 
-    def generator
+    def generate
       unless File.exist?('config.ru')
         puts "'config.ru' is not found."
         exit(1)
@@ -23,10 +23,10 @@ module HalfMoon
 
     def switch_generate(target)
       case target
-      when 'controller'
+      when /^c$|^controller$/
         ctrl_name = ARGV.shift
         ControllerGenerator.start([ctrl_name, ARGV])
-      when 'model'
+      when /^m$|^model$/
         model_name = ARGV.shift
         ModelGenerator.start([model_name, ARGV])
       else
@@ -44,7 +44,7 @@ module HalfMoon
     def command_handler(command)
       new if command =~ /^n$|^new$/
       server if command =~ /^s$|^server$/
-      generator if command =~ /^g$|^generator$/
+      generate if command =~ /^g$|^generate$/
     end
 
     private
