@@ -34,4 +34,5 @@
 # end
 #
 # /:<name> is URL Path Parameter
-# You can retrieve the value by calling @paths [: <name>] in Controller or View.
+# You can retrieve the value by calling @paths [:<name>] in Controller or View.
+#

@@ -73,7 +73,7 @@ module HalfMoon
 
     def create_view
       methods.each do |m|
-        template './templates/view.tt', "#{@view}/#{name}/#{m}.erb"
+        template './templates/view.tt', "#{@view}/#{name}/#{m}.html.erb"
       end
     end
 

@@ -4,10 +4,7 @@ require 'halfmoon/loader'
 class Action
   extend HalfMoon::Loader
 
-  MIME_TYPES = {
-    html: 'text/html',
-    json: 'application/json'
-  }.freeze
+  MIME_TYPES = Rack::Mime::MIME_TYPES
 
   def initialize(params)
     @paths = params[:Paths]
@@ -44,16 +41,21 @@ class Action
 
   protected
 
-  def render(mime_type, file)
+  def render(file)
     view_path = Config[:root] + Config[:view_path]
-    header = { 'Content-Type' => MIME_TYPES[mime_type] }
+    file_path = Dir.glob(view_path + "#{file}*").first # /path/to/index.html.erb
+    filename = file_path.split('/').last               # ex: index.html.erb
+    mime_type = filename.split('.')[1]                 # ex: html
     body = ERB.new(
-      File.open(view_path + file + '.erb').read
+      File.open(file_path).read
     ).result(binding)
-    [200, header, [body]]
+    HalfMoon.application.response['Content-Type'] = MIME_TYPES[".#{mime_type}"]
+    HalfMoon.application.response.write(body)
+    body
   end
 
   def redirect_to(path)
-    [303, { 'Location' => path }, ['']]
+    HalfMoon.application.response['Location'] = path
+    HalfMoon.application.response.write('')
   end
 end
