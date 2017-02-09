@@ -40,7 +40,10 @@ module HalfMoon
       klass = @args[:File].capitalize + 'Controller'
       ins = Kernel.const_get(klass).new(compile_params(req))
       ins.before_action
-      ins.send(@args[:Action].to_sym)
+      if (body = ins.send(@args[:Action].to_sym)).is_a?(HalfMoon::Raw)
+        response.write(body)
+      else response.write(ins.default_rendering(@args[:File], @args[:Action]))
+      end
       ins.after_action
     end
 
@@ -49,12 +52,20 @@ module HalfMoon
       post = req.POST
       { Paths: @args[:PathV], GET: get, POST: post, Session: req.session }
     end
+
+    def response
+      HalfMoon.application.response
+    end
   end
 
   class Response < Rack::Response
     def clear
       initialize
     end
+  end
+
+  # responseObject
+  class Raw < String
   end
 
   # RackApplication

@@ -3,8 +3,15 @@ require 'halfmoon/loader'
 # Action
 class Action
   extend HalfMoon::Loader
-
+  attr_accessor :session
+  attr_reader :paths, :get, :post
   MIME_TYPES = Rack::Mime::MIME_TYPES
+  VALIDATE   = [:response].freeze
+
+  def self.method_added(name)
+    return if self == Action
+    remove_method(name) if Action.instance_eval { VALIDATE.include?(name) }
+  end
 
   def initialize(params)
     @paths = params[:Paths]
@@ -23,39 +30,32 @@ class Action
   def after_action
   end
 
-  # このメソッドのbinding
   def bind
     binding
   end
 
-  # @param [Symbol] model_name 使用するモデルの名前
-  # @param [String, nil] file_name 使用するモデルのパス
-  def self.use_model(model_name, file_name = nil)
-    file_name = Config[:root] + Config[:model_path] + model_name.to_s.downcase + '.rb' if file_name.nil?
-    load file_name
-  end
-
-  def session
-    @session
+  # @param String method
+  def default_rendering(klass, method)
+    render("#{klass}/#{method}")
   end
 
   protected
 
   def render(file)
-    view_path = Config[:root] + Config[:view_path]
-    file_path = Dir.glob(view_path + "#{file}*").first # /path/to/index.html.erb
-    filename = file_path.split('/').last               # ex: index.html.erb
-    mime_type = filename.split('.')[1]                 # ex: html
-    body = ERB.new(
-      File.open(file_path).read
-    ).result(binding)
-    HalfMoon.application.response['Content-Type'] = MIME_TYPES[".#{mime_type}"]
-    HalfMoon.application.response.write(body)
-    body
+    file_path = Dir.glob("#{Config[:root]}#{Config[:view_path]}#{file.gsub('/', '/*')}*").first # /path/to/index.html.erb
+    unless (file_info = file_path.split('/').last.split('.')).first[0] == '_'
+      mime_type = file_info[1] # ex: html
+      response['Content-Type'] = MIME_TYPES[".#{mime_type}"]
+    end
+    HalfMoon::Raw.new(ERB.new(File.open(file_path).read).result(binding))
   end
 
   def redirect_to(path)
-    HalfMoon.application.response['Location'] = path
-    HalfMoon.application.response.write('')
+    response['Location'] = path
+    response.write('')
+  end
+
+  def response
+    HalfMoon.application.response
   end
 end
