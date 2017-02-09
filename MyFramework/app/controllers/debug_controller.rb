@@ -12,13 +12,13 @@ class DebugController < Action
   def index
     @action = { Class: fullname, Method: __method__ }
     session[:hoge] = 'Session格納確認' if session[:hoge].nil?
-    render(:html, 'debug/debug') # view/debug/debug.erbをHTMLとしてレスポンスを返している！
+    render('debug/debug') # view/debug/debug.erbをHTMLとしてレスポンスを返している！
   end
 
   def show
     @action = { Class: fullname, Method: __method__ }
     # redirect_to('/debug') # リダイレクトしたい場合
-    render(:html, 'debug/debug')
+    render('debug/debug')
   end
 
   def fullname

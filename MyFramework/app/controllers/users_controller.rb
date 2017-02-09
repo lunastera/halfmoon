@@ -1,12 +1,12 @@
 class UsersController < Action
   def index
-    render(:html, 'users/index')
+    render('users/index')
   end
 
   def show
     @users = User.all
     user = User.new
-    render(:html, 'users/show')
+    render('users/show')
   end
 
   def login
@@ -17,6 +17,6 @@ class UsersController < Action
     #     redirect_to('/index')
     #   end
     # end
-    render(:html, 'users/show')
+    render('users/show')
   end
 end
