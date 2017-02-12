@@ -15,11 +15,15 @@ module HalfMoon
         $mapping = @path
       end
 
+      def root(path, action)
+        @path << [path, action]
+      end
+
       def get(path, action)
         @buff << [path, action]
       end
 
-      def root(path, &block)
+      def parent(path, &block)
         yield
         @path << [path, @buff]
         @buff = []
@@ -34,26 +38,9 @@ module HalfMoon
       @var_rexp = /[^\w\W]/ unless @var_rexp.to_s =~ %r{\(\\z\)}
     end
 
-    # debug
-    def instances
-      # p @var_path
-      p @dict_path
-    end
-
     def action_variables(request_path)
       # request_pathの最後に'/'があれば削除
       request_path.chop! if request_path.gsub!(%r{/+}, '/')[-1] == '/'
-      # 正規表現で何番目のvar_url_listにマッチするか調べる
-      # find_route = @var_rexp.match(request_path) # /users/show
-      # # var_url_listのものでない(nil)ならば、O(1)でHashから検索
-      # if find_route.nil?
-      #   actions = @dict_path[request_path]
-      #   dict = nil
-      # else
-      #   rexp, names, actions = @var_path[find_route.captures.find_index('')]
-      #   values = rexp.match(request_path).captures
-      #   dict = Hash[names.zip(values)]
-      # end
 
       if @dict_path.key?(request_path)
         actions = @dict_path[request_path]
@@ -123,7 +110,7 @@ module HalfMoon
     def require_action(action)
       file, action = action.split('/')
       begin
-        require Config[:root] + Config[:ctrl_path] + file + '_controller'
+        require "#{Config[:root]}#{Config[:ctrl_path]}#{file}_controller"
       rescue LoadError => ex
         p Config[:root] + Config[:ctrl_path] + file
         raise ex, 'specified file does not exist.'
@@ -131,8 +118,3 @@ module HalfMoon
     end
   end
 end
-
-# require_relative './routes.rb'
-#
-# ins = HalfMoon::Route.new($mapping)
-# ins.instances

@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["宇野嵐"]
   spec.email         = ["araera48@gmail.com"]
 
-  spec.summary       = %q{test}
-  spec.description   = %q{test}
-  spec.homepage      = "http://example.com"
+  spec.summary       = %q{Web application framework.}
+  spec.description   = %q{Halfmoon is a high-speed framework that adopts the MVC structure.}
+  spec.homepage      = "https://github.com/sobreera/halfmoon"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'

@@ -18,8 +18,8 @@ class Action
     @get   = params[:GET]
     @post  = params[:POST]
     @session = params[:Session]
-    Action.all_autoload Config[:root] + Config[:model_path] + '*.rb'
-    @db = HalfMoon::DB.sqlite
+    Action.all_autoload "#{Config[:root]}#{Config[:model_path]}*.rb"
+    @db = HalfMoon::Database.connect
   end
 
   # 必ずアクション前に実行される処理
@@ -28,10 +28,6 @@ class Action
 
   # 必ずアクション後に実行される処理
   def after_action
-  end
-
-  def bind
-    binding
   end
 
   # @param String method
@@ -51,8 +47,7 @@ class Action
   end
 
   def redirect_to(path)
-    response['Location'] = path
-    response.write('')
+    response.redirect(path)
   end
 
   def response

@@ -5,6 +5,7 @@
   <title>Welcome to HalfMoon</title>
 </head>
 <body>
-<h1>Welcome to HalfMoon!</h1>
+  <h1>Welcome to HalfMoon!</h1>
+  <h2><%=name.capitalize%>#<%=@method%></h2>
 </body>
 </html>

@@ -1,8 +1,9 @@
 class <%= name.pluralize.capitalize %>Migration < HalfMoon::Migration
   def create
     @db.create_table :<%=name.pluralize%> do
-      <% @c.each do |k, v| %><%="#{v[0]} :#{k}, #{v[1].join(', ') unless v.length == 1}"%>
-    <% end %>end
+      <% @c.each do |k, v| %><%="#{v[0]} :#{k}#{(v[1].empty?)? "" : ", #{v[1].join(', ')}" }"%>
+      <% end %>
+    end
   end
 
   def drop

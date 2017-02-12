@@ -9,39 +9,39 @@ module HalfMoon
 
     # 実行されたディレクトリに作成する
     def self.source_root
-      File.expand_path(File.dirname('.'))
+      File.expand_path(File.dirname(__FILE__))
     end
 
     def create_assets
-      @file = File.expand_path(File.dirname(__FILE__))
+      @current = File.expand_path(File.dirname('.'))
       %w(css img js).each do |dir|
-        empty_directory "#{name}/app/assets/#{dir}"
+        empty_directory "#{@current}/#{name}/app/assets/#{dir}"
       end
     end
 
     def create_config
-      %w(config routes).each do |file|
-        copy_file "#{@file}/templates/config/#{file}.rb", "#{name}/app/config/#{file}.rb"
-      end
+      template './templates/config/config.tt',  "#{@current}/#{name}/app/config/config.tt"
+      copy_file './templates/config/routes.rb', "#{@current}/#{name}/app/config/routes.rb"
     end
 
     def create_mvc
       %w(models views controllers).each do |dir|
-        empty_directory "#{name}/app/#{dir}"
+        empty_directory "#{@current}/#{name}/app/#{dir}"
       end
     end
 
     def create_db
-      empty_directory "#{name}/app/db/migration"
+      empty_directory "#{@current}/#{name}/app/db/migration"
+      copy_file './templates/models/seeds.rb', "#{@current}/#{name}/app/db/seeds.rb"
     end
 
     def create_exceptions
-      copy_file "#{@file}/templates/exceptions/default.erb", "#{name}/app/exceptions/default.erb"
+      copy_file './templates/exceptions/default.erb', "#{@current}/#{name}/app/exceptions/default.erb"
     end
 
     def create_other_files
       %w(config.ru Rakefile).each do |file|
-        copy_file "#{@file}/templates/#{file}", "#{name}/#{file}"
+        copy_file "./templates/#{file}", "#{@current}/#{name}/#{file}"
       end
     end
 
@@ -68,11 +68,12 @@ module HalfMoon
     end
 
     def create_controller
-      template "./templates/controller.tt", "#{@ctrl}/#{name}_controller.rb"
+      template './templates/controller.tt', "#{@ctrl}/#{name}_controller.rb"
     end
 
     def create_view
       methods.each do |m|
+        @method = m
         template './templates/view.tt', "#{@view}/#{name}/#{m}.html.erb"
       end
     end
@@ -116,7 +117,7 @@ module HalfMoon
           end
         end
         opts.compact!
-        @c.store(name, [type, opts])
+        @c.store(name, [type, opts].compact)
       end
     end
 

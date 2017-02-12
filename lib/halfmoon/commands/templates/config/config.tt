@@ -1,12 +1,16 @@
 require 'digest/sha2'
 # Main config
 class Config < ConfigBase
+  # application settings
+  add :title,         '<%=name%>'
+
   # database settings
-  add :db_host,      'localhost'
-  add :db_port,      '8888'
-  add :db_user,      'root'
-  add :db_pass,      'root'
-  add :db_name,      'default.db'
+  add :db_type,       'sqlite' # sqlite or mysql
+  add :db_host,       'localhost'
+  add :db_port,       '8888'
+  add :db_user,       'root'
+  add :db_pass,       'root'
+  add :db_name,       'default'
 
   # path setting
   add :root,        File.expand_path('../../', File.dirname(__FILE__))

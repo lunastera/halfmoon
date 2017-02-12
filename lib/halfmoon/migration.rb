@@ -2,7 +2,7 @@ module HalfMoon
   # model migration
   class Migration
     def initialize
-      @db = DB.sqlite
+      @db = Database.connect
     end
 
     def create
@@ -10,7 +10,7 @@ module HalfMoon
       # db:create table_name
     end
 
-    def change
+    def drop
       # rake
       # db:change table_name
     end

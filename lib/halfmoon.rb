@@ -2,11 +2,11 @@
 require 'rack'
 require 'erb'
 require 'sequel'
+require 'cgi'
 
 # other
 require 'halfmoon/config'
 require 'halfmoon/exception'
-require 'halfmoon/util'
 require 'halfmoon/route'
 require 'halfmoon/action'
 require 'halfmoon/loader'
@@ -17,7 +17,7 @@ require 'halfmoon/cli'
 module HalfMoon
   extend HalfMoon::Loader
 
-  VERSION = '0.1.0'.freeze
+  VERSION = '0.1.2'.freeze
 
   class << self
     @application = @app_class = nil
@@ -28,7 +28,7 @@ module HalfMoon
     end
   end
 
-  # Action matched Class
+  # Action executed Class
   class ActionExecution
     # @params [Hash] action_args File: ファイル名, Action: 実行されるメソッド, PathV: パスパラメータ
     def initialize(action_args)
@@ -36,20 +36,38 @@ module HalfMoon
     end
 
     def response_action(req)
-      HalfMoon.hm_load Config[:ctrl_path] + @args[:File] + '_controller'
-      klass = @args[:File].capitalize + 'Controller'
+      HalfMoon.hm_load "#{Config[:ctrl_path]}#{@args[:File]}_controller"
+      klass = "#{@args[:File].capitalize}Controller"
       ins = Kernel.const_get(klass).new(compile_params(req))
+      return if before_action(ins)
+      return if main_action(ins)
+      return if after_action(ins)
+    end
+
+    private
+
+    def before_action(ins)
       ins.before_action
+      response.redirect?
+    end
+
+    def main_action(ins)
       if (body = ins.send(@args[:Action].to_sym)).is_a?(HalfMoon::Raw)
         response.write(body)
-      else response.write(ins.default_rendering(@args[:File], @args[:Action]))
+      elsif !response.redirect?
+        response.write(ins.default_rendering(@args[:File], @args[:Action]))
       end
+      response.redirect?
+    end
+
+    def after_action(ins)
       ins.after_action
+      response.redirect?
     end
 
     def compile_params(req)
-      get = req.GET
-      post = req.POST
+      get = req.GET.map { |k, v| [k.to_sym, v] }.to_h # keyをsymbol化して返す
+      post = req.POST.map { |k, v| [k.to_sym, v] }.to_h
       { Paths: @args[:PathV], GET: get, POST: post, Session: req.session }
     end
 
@@ -58,14 +76,18 @@ module HalfMoon
     end
   end
 
+  # ResponseClass
   class Response < Rack::Response
     def clear
       initialize
     end
   end
 
-  # responseObject
+  # bodyObject
   class Raw < String
+    def initialize(str)
+      super CGI.pretty(str.gsub(/^\s+|[\r\n]+/, ''))
+    end
   end
 
   # RackApplication
@@ -73,11 +95,11 @@ module HalfMoon
     attr_accessor :response
     def initialize(mapping = nil)
       @route = Route.new(mapping)
+      HalfMoon.app_class = self
     end
 
     def call(env)
-      response.clear unless response.empty?
-      HalfMoon.app_class = self
+      response.clear
       req = Rack::Request.new(env)
       args = @route.action_variables(req.path_info)
       if args[:File] == 404

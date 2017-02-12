@@ -13,7 +13,6 @@ namespace :db do
 
   desc 'MigrationファイルからDBを操作'
   task :migration, ['table', 'method'] => [:require_config, :require_model] do |_, args|
-    Config.add :root, File.expand_path(File.dirname(__FILE__))
     require_relative "./app/db/migration/#{args[:table]}_migration.rb"
     klass = "#{args[:table].capitalize}Migration"
     begin
@@ -22,5 +21,18 @@ namespace :db do
       puts "undefined method `#{args[:method]}` for #{klass}."
       exit(1)
     end
+  end
+
+  desc 'seed.rbからDBを初期化'
+  task seed: [:require_config] do |_, args|
+    require 'halfmoon/db'
+    require 'sequel'
+    @db = HalfMoon::Database.connect
+    files = Dir.glob("#{Config[:root]}#{Config[:model_path]}*.rb")
+    files.each do |file|
+      const_name = file.split('/').last.capitalize.gsub(/\.rb$/, '')
+      autoload const_name, file
+    end
+    require_relative './app/db/seeds.rb'
   end
 end
