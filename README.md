@@ -19,18 +19,19 @@ cd exampleProject
 
 #### コントローラーの作成
 
-    bundle exec ../bin/halfmoon generator controller users index show
+    bundle exec ../bin/halfmoon generate controller users index show
 
 #### モデルの作成
 
-    bundle exec ../bin/halfmoon generator model users
+    bundle exec ../bin/halfmoon generate model users
 
 ### ルーティングの設定
 
-app/config/route.rb
+app/config/routes.rb
 ```ruby
 HalfMoon::Route::generate do |r|
-  r.root '/user' do
+  r.root '',        'pages/index'
+  r.parent '/user' do
     r.get '/index', 'users/index'
     r.get '/:id',   'users/show'
   end
