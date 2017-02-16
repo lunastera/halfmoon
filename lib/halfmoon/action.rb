@@ -3,8 +3,7 @@ require 'halfmoon/loader'
 # Action
 class Action
   extend HalfMoon::Loader
-  attr_accessor :session
-  attr_reader :paths, :get, :post
+  attr_accessor :params
   MIME_TYPES = Rack::Mime::MIME_TYPES
   VALIDATE   = [:response].freeze
 
@@ -14,13 +13,18 @@ class Action
   end
 
   def initialize(params)
-    @paths = params[:Paths]
-    @get   = params[:GET]
-    @post  = params[:POST]
-    @session = params[:Session]
+    @params = params
     Action.all_autoload "#{Config[:root]}#{Config[:model_path]}*.rb"
     @db = HalfMoon::Database.connect
   end
+
+  def paths;  @params[:paths];  end
+  def get;    @params[:get];    end
+  def post;   @params[:post];   end
+  def session;@params[:session];end
+  alias GET get
+  alias POST post
+  alias SESSION session
 
   # 必ずアクション前に実行される処理
   def before_action
@@ -30,7 +34,6 @@ class Action
   def after_action
   end
 
-  # @param String method
   def default_rendering(klass, method)
     render("#{klass}/#{method}")
   end

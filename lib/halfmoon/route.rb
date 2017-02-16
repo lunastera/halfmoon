@@ -1,4 +1,3 @@
-require 'erb'
 require 'pp'
 
 module HalfMoon
@@ -57,10 +56,8 @@ module HalfMoon
       # 存在しなければ404
       return { File: 404, Action: nil, PathV: nil } if actions.nil?
       file, action = actions.split('/')
-      # メソッド未定義ならindexメソッド
-      action = 'index' if action.nil?
-      # FileName, ClassName, MethodName, PathValiable
-      { File: file, Action: action, PathV: dict }
+      # FileName, MethodName, PathValiable
+      { file: file, action: action, path_v: dict }
     end
 
     private
@@ -96,7 +93,7 @@ module HalfMoon
         # puts "'#{path}' => #{current_fullpath} #{action}"
         @dict_path[current_fullpath + path] = action
       end
-      (path.scan(/:\w+/) == []) ? nil : path.gsub(%r{:[^./]+}, '\w+') + '(\z)'
+      path.scan(/:\w+/) == [] ? nil : path.gsub(%r{:[^./]+}, '\w+') + '(\z)'
     end
 
     # var_url_listの場合、場所を特定する正規表現も必要なので作成

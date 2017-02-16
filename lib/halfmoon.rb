@@ -36,8 +36,8 @@ module HalfMoon
     end
 
     def response_action(req)
-      HalfMoon.hm_load "#{Config[:ctrl_path]}#{@args[:File]}_controller"
-      klass = "#{@args[:File].capitalize}Controller"
+      HalfMoon.hm_load "#{Config[:ctrl_path]}#{@args[:file]}_controller"
+      klass = "#{@args[:file].capitalize}Controller"
       ins = Kernel.const_get(klass).new(compile_params(req))
       return if before_action(ins)
       return if main_action(ins)
@@ -52,10 +52,10 @@ module HalfMoon
     end
 
     def main_action(ins)
-      if (body = ins.send(@args[:Action].to_sym)).is_a?(HalfMoon::Raw)
+      if (body = ins.send(@args[:action].to_sym)).is_a?(HalfMoon::Raw)
         response.write(body)
       elsif !response.redirect?
-        response.write(ins.default_rendering(@args[:File], @args[:Action]))
+        response.write(ins.default_rendering(@args[:file], @args[:action]))
       end
       response.redirect?
     end
@@ -68,7 +68,7 @@ module HalfMoon
     def compile_params(req)
       get = req.GET.map { |k, v| [k.to_sym, v] }.to_h # keyをsymbol化して返す
       post = req.POST.map { |k, v| [k.to_sym, v] }.to_h
-      { Paths: @args[:PathV], GET: get, POST: post, Session: req.session }
+      { paths: @args[:path_v], get: get, post: post, session: req.session }
     end
 
     def response
@@ -102,7 +102,7 @@ module HalfMoon
       response.clear
       req = Rack::Request.new(env)
       args = @route.action_variables(req.path_info)
-      if args[:File] == 404
+      if args[:file] == 404
         ex = ShowException.new(404)
         return ex.show
       end
