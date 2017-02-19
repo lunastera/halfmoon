@@ -1,9 +1,12 @@
 require 'halfmoon'
 require 'halfmoon/config'
+
+extend HalfMoon::RouteDelegator
+
 require_relative './app/config/routes.rb'
 require_relative './app/config/config.rb'
 
-app = HalfMoon::Application.new($mapping)
+app = HalfMoon::Application.new(mapping)
 
 require 'rack/session/cookie'
 app = Rack::Session::Cookie.new(app, Config.get_all(/session_/))

@@ -17,7 +17,7 @@ require 'halfmoon/cli'
 module HalfMoon
   extend HalfMoon::Loader
 
-  VERSION = '0.1.2'.freeze
+  VERSION = '0.2.0'.freeze
 
   class << self
     @application = @app_class = nil
@@ -36,26 +36,39 @@ module HalfMoon
     end
 
     def response_action(req)
-      HalfMoon.hm_load "#{Config[:ctrl_path]}#{@args[:file]}_controller"
-      klass = "#{@args[:file].capitalize}Controller"
+      file, action = request_handler(req.request_method).split('/')
+      HalfMoon.hm_load "#{Config[:ctrl_path]}#{file}_controller"
+      klass = "#{file.capitalize}Controller"
       ins = Kernel.const_get(klass).new(compile_params(req))
       return if before_action(ins)
-      return if main_action(ins)
+      return if main_action(ins, file, action)
       return if after_action(ins)
     end
 
     private
+
+    def request_handler(request_method)
+      action = nil
+      @args.each do |m, a|
+        if request_method.to_sym == m
+          action = a
+          break
+        end
+      end
+      action = @args[:action][:GET] if action.nil?
+      action
+    end
 
     def before_action(ins)
       ins.before_action
       response.redirect?
     end
 
-    def main_action(ins)
-      if (body = ins.send(@args[:action].to_sym)).is_a?(HalfMoon::Raw)
+    def main_action(ins, file, action)
+      if (body = ins.send(action.to_sym)).is_a?(HalfMoon::Raw)
         response.write(body)
       elsif !response.redirect?
-        response.write(ins.default_rendering(@args[:file], @args[:action]))
+        response.write(ins.default_rendering(file, action))
       end
       response.redirect?
     end
@@ -94,7 +107,7 @@ module HalfMoon
   class Application
     attr_accessor :response
     def initialize(mapping = nil)
-      @route = Route.new(mapping)
+      @route = Router.new(mapping)
       HalfMoon.app_class = self
     end
 
@@ -102,7 +115,7 @@ module HalfMoon
       response.clear
       req = Rack::Request.new(env)
       args = @route.action_variables(req.path_info)
-      if args[:file] == 404
+      if args[:action] == 404
         ex = ShowException.new(404)
         return ex.show
       end

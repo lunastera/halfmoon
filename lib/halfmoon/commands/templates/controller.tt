@@ -1,5 +1,5 @@
 class <%= name.capitalize %>Controller < Action<% methods.each do |method|%>
   def <%= method %>
-    render(:html, '<%=name%>/<%=method%>')
+    render '<%=name%>/<%=method%>'
   end
 <% end %>end

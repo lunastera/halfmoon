@@ -20,7 +20,7 @@ module HalfMoon
     end
 
     def create_config
-      template './templates/config/config.tt',  "#{@current}/#{name}/app/config/config.tt"
+      template './templates/config/config.tt',  "#{@current}/#{name}/app/config/config.rb"
       copy_file './templates/config/routes.rb', "#{@current}/#{name}/app/config/routes.rb"
     end
 
