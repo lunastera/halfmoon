@@ -1,6 +1,6 @@
 
 require 'rack'
-require 'erb'
+require 'tilt'
 require 'sequel'
 require 'cgi'
 
@@ -17,7 +17,7 @@ require 'halfmoon/cli'
 module HalfMoon
   extend HalfMoon::Loader
 
-  VERSION = '0.2.0'.freeze
+  VERSION = '0.3.0'.freeze
 
   class << self
     @application = @app_class = nil
@@ -81,7 +81,8 @@ module HalfMoon
     def compile_params(req)
       get = req.GET.map { |k, v| [k.to_sym, v] }.to_h # keyをsymbol化して返す
       post = req.POST.map { |k, v| [k.to_sym, v] }.to_h
-      { paths: @args[:path_v], get: get, post: post, session: req.session }
+      format = (f = req.path_info.split('.')).length == 1 ? nil : f.last
+      { paths: @args[:path_v], get: get, post: post, session: req.session, format: format }
     end
 
     def response
@@ -114,14 +115,20 @@ module HalfMoon
     def call(env)
       response.clear
       req = Rack::Request.new(env)
-      args = @route.action_variables(req.path_info)
-      if args[:action] == 404
-        ex = ShowException.new(404)
-        return ex.show
-      end
+      request_path = path_filter_format(req.path_info)
+      args = @route.action_variables(request_path)
+      return ShowException.new(404).show if args[:action].nil?
       act_match = ActionExecution.new(args)
       act_match.response_action(req)
       response.finish
+    end
+
+    def path_filter_format(path)
+      return path if path.scan(/\./).empty?
+      return path.chop! if path[-1] == '.'
+      paths = path.split('.')
+      paths.pop
+      paths.join('.')
     end
 
     def response

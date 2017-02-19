@@ -35,18 +35,38 @@ class Action
   end
 
   def default_rendering(klass, method)
-    render("#{klass}/#{method}")
+    render "#{klass}/#{method}"
   end
 
   protected
 
-  def render(file)
-    file_path = Dir.glob("#{Config[:root]}#{Config[:view_path]}#{file.gsub('/', '/*')}*").first # /path/to/index.html.erb
+  def render(file, *opts)
+    opts = opt_parser(opts)
+    base_path = "#{Config[:root]}#{Config[:view_path]}#{file.gsub('/', '/*')}"
+    files = Dir.glob("#{base_path}*")
+    if files.length == 1
+      file_path = files.first
+    else
+      files.each do |path|
+        file_path = path if path.split('.').last == opts[:template]
+      end
+    end
+    file_path.files.first if file_path.nil?
     unless (file_info = file_path.split('/').last.split('.')).first[0] == '_'
       mime_type = file_info[1] # ex: html
       response['Content-Type'] = MIME_TYPES[".#{mime_type}"]
     end
-    HalfMoon::Raw.new(ERB.new(File.open(file_path).read).result(binding))
+    HalfMoon::Raw.new(Tilt.new(file_path).render(self))
+  end
+
+  def opt_parser(opts)
+    opts = opts.first.is_a?(Hash) ? opts.first : {}
+    return opts if opts[:template].nil?
+    if !opts[:template].is_a?(Symbol) && !opts[:template].is_a?(String)
+      raise TypeError, 'format option is specified by String or Symbol.'
+    end
+    opts[:template] = opts[:template].to_s if opts[:template].is_a?(Symbol)
+    opts
   end
 
   def redirect_to(path)

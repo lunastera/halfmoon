@@ -4,7 +4,7 @@ module HalfMoon
     def initialize(mapping)
       @dict_paths = {}
       @var_paths = []
-      buf = compile_path_regexp(mapping, '', '')
+      buf = "\\A#{compile_path_regexp(mapping, '', '')}"
       @var_rexp = Regexp.compile(buf.gsub(%r{\|\(\?:+}, '(?:')) unless buf.nil?
       @var_rexp = /[^\w\W]/ unless @var_rexp.to_s =~ /\(\\z\)/
     end
