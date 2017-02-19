@@ -1,6 +1,5 @@
 #
-# Write routing settings in this file.
-# An example of description is as follows.
+# これは記述例です。
 #
 # $mapping = [
 #   ['', 'debug/index'],
@@ -18,23 +17,17 @@
 #
 # ['RequestPath', 'ControllerFileName/MethodName']
 #
-# OR
+# もしくは
 #
-# HalfMoon::Route.generate do |r|
-#   r.root '',            'pages/index'
-#   r.root '/:id',        'pages/show'
-#   r.parent '/debug' do
-#     r.get '',           'debug/index'
-#     r.get '/:id',       'debug/show'
-#     r.get '/:name/:id', 'debug/show'
-#   end
-#   r.parent '/users' do
-#     r.get '',           'users/index'
-#     r.get '/show',      'users/show'
-#     r.get '/show/:id',  'users/show'
+# generate do
+#   request '', 'index/index' # アクションの指定をStringにした場合はGETリクエストとして処理されます。
+#   parent  '/users' do       # ネストする場合parentを使って纏めて下さい。
+#     request '', 'users/index' # この場合は /users/index にマッチします。
+#     # 第2引数以降にハッシュを指定すればkeyのメソッドの場合はvalueの処理、と言う分け方ができます。
+#     request '', GET: 'users/index', POST: 'users/show'
 #   end
 # end
 #
-# /:<name> is URL Path Parameter
-# You can retrieve the value by calling @paths [:<name>] in Controller or View.
+# /:<name> はURLパスパラメータとして取得できます。
+# もしあなたがこの値を利用したい場合はControllerかViewで paths[:<name>] を呼び出して下さい。
 #

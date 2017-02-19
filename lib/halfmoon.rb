@@ -7,7 +7,7 @@ require 'cgi'
 # other
 require 'halfmoon/config'
 require 'halfmoon/exception'
-require 'halfmoon/route'
+require 'halfmoon/router'
 require 'halfmoon/action'
 require 'halfmoon/loader'
 require 'halfmoon/db'

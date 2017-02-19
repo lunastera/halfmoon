@@ -1,5 +1,3 @@
-require 'pp'
-
 module HalfMoon
   # Routing
   class Router

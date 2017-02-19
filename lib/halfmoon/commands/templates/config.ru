@@ -1,10 +1,8 @@
 require 'halfmoon'
 require 'halfmoon/config'
-
-extend HalfMoon::RouteDelegator
-
 require_relative './app/config/routes.rb'
 require_relative './app/config/config.rb'
+extend HalfMoon::RouteDelegator
 
 app = HalfMoon::Application.new(mapping)
 

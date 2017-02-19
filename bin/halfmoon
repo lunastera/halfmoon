@@ -2,4 +2,5 @@
 
 require 'halfmoon/cli'
 
+extend HalfMoon::RouteDelegator
 HalfMoon::CLI.new
