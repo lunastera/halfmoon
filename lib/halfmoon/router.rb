@@ -10,8 +10,6 @@ module HalfMoon
     end
 
     def action_variables(request_path)
-      # request_pathの最後に'/'があれば削除
-      request_path.chop! if request_path.gsub!(%r{/+}, '/')[-1] == '/'
       if @dict_paths.key?(request_path)
         action = @dict_paths[request_path]
         dict = nil

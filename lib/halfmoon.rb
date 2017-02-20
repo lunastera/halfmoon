@@ -126,6 +126,7 @@ module HalfMoon
     def path_filter_format(path)
       return path if path.scan(/\./).empty?
       return path.chop! if path[-1] == '.'
+      path.chop! if path.gsub!(%r{/+}, '/')[-1] == '/'
       paths = path.split('.')
       paths.pop
       paths.join('.')

@@ -1,23 +1,5 @@
 #
-# これは記述例です。
-#
-# $mapping = [
-#   ['', 'debug/index'],
-#   ['/debug', [
-#     ['',           'debug/index'],
-#     ['/:id',       'debug/show'],
-#     ['/:name/:id', 'debug/show']
-#   ]],
-#   ['/users', [
-#     ['',           'users/index'],
-#     ['/show',      'users/show'],
-#     ['/show/:id',  'users/show']
-#   ]]
-# ]
-#
-# ['RequestPath', 'ControllerFileName/MethodName']
-#
-# もしくは
+# 以下は記述例です。
 #
 # generate do
 #   request '', 'index/index' # アクションの指定をStringにした場合はGETリクエストとして処理されます。
