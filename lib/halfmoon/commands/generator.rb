@@ -72,9 +72,10 @@ module HalfMoon
     end
 
     def create_view
+      config = { title: '<%=Config[:title]%>', method: nil }
       methods.each do |m|
-        @method = m
-        template './templates/view.tt', "#{@view}/#{name}/#{m}.html.erb"
+        config[:method] = m
+        template './templates/view.tt', "#{@view}/#{name}/#{m}.html.erb", config
       end
     end
 

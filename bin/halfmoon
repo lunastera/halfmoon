@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'halfmoon/cli'
+require 'halfmoon'
 
 extend HalfMoon::RouteDelegator
 HalfMoon::CLI.new
