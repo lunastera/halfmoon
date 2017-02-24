@@ -29,11 +29,14 @@ cd exampleProject
 
 app/config/routes.rb
 ```ruby
-HalfMoon::Route::generate do |r|
-  r.root '',        'pages/index'
-  r.parent '/user' do
-    r.get '/index', 'users/index'
-    r.get '/:id',   'users/show'
+generate do
+  # 文字列で指定した場合GETリクエストとなる
+  request '', 'pages/index' # localhost:8282
+  parent '/pages' do
+    request '/index', GET: 'pages/index'  # localhost:8282/index
+    # Hashで指定する場合複数のリクエストメソッドを定義できる
+    # またURLパスパラメータを取得できる
+    request '/:id',   GET: 'pages/show', POST: 'pages/show'
   end
 end
 ```
